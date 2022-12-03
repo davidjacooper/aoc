@@ -5,3 +5,6 @@
 
 # Other compiled files
 *.class
+
+# Other temp files
+*.swp

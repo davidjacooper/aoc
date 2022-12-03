@@ -1,7 +1,5 @@
 import scala.io.StdIn
 
-import java.util.BitSet
-
 object Day3_Part1
 {
     def main(args: Array[String]): Unit =
@@ -21,7 +19,6 @@ object Day3_Part1
             val halfWay = line.length() / 2
             val bits = makeBits(line.substring(0, halfWay))
             val matchedValue = findMatchedValue(bits, line.substring(halfWay))
-            println("bits=" + bits + ", matchedValue=" + matchedValue)
             matchedValue + run()
         }
     }
