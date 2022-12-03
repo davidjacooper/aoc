@@ -1,3 +1,7 @@
+# All files without dots
 *
 !*/
 !*.*
+
+# Other compiled files
+*.class
