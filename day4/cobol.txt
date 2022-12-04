@@ -1,0 +1,19 @@
+Day 4 in Cobol
+==============
+
+I used GnuCOBOL (https://gnucobol.sourceforge.io), compiling as follows:
+
+$ cobc -x day4_part1.cbl
+$ cobc -x day4_part2.cbl
+
+Reference:
+https://gnucobol.sourceforge.io/guides.html
+https://en.wikipedia.org/wiki/COBOL
+
+Thoughts: Cobol is the car designed before anyone properly worked out how wheels work. 
+
+Fun facts:
+
+* You must indent _the entire program_ by 7 spaces.
+* To read from standard input ('sysin'), you must declare it as a kind of file (you have to declare input files), and this declaration contains the variable ('input-line' in my case) into which user input will be read.
+* String splitting is done by the 'unstring' statement.
