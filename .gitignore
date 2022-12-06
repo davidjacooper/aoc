@@ -3,6 +3,9 @@
 !*/
 !*.*
 
+# Except the 'input' files
+!input
+
 # Other compiled files
 *.class
 *.o
