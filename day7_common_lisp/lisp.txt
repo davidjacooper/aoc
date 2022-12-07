@@ -1,0 +1,15 @@
+Day 7 with Common Lisp
+======================
+
+Running:
+
+Uses Gnu Common Lisp (gcl). 
+
+$ chmod 755 day7_part1.lisp
+$ ./day7_part1.lisp < input
+
+$ chmod 755 day7_part2.lisp
+$ ./day7_part2.lisp < input
+
+Thoughts: Lisp is interesting, but I entirely underestimated the time needed.
+
