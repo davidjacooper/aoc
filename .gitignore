@@ -3,10 +3,6 @@
 !*/
 !*.*
 
-# Except the 'input' files
-!input
-!simple_input*
-
 # Other compiled files
 *.class
 *.o
