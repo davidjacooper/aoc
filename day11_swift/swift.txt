@@ -1,0 +1,14 @@
+Day 11 in Swift
+===============
+
+There's no package for the Swift compiler in many (most?) Linux distro repositories. You must generally download it from https://www.swift.org/download/, and possibly add a couple of dependency packages manually. I had to install libtinfo5 and libncurses5 with apt-get. (I'm using a Debian 11 VM on ChromeOS.)
+
+Compiling and running:
+
+$ swiftc day11_part1.swift
+$ ./day11_part1.swift < input
+
+$ swiftc day11_part2.swift
+$ ./day11_part2.swift < input
+
+Thoughts: Swift is a nice clean language, and generally very easy and intuitive. A minor gripe: its pattern matching doesn't seem to be quite as extensive as (for instance) Rust. Once a language supports some level of pattern matching, it's awkward when it doesn't quite go all the way.
