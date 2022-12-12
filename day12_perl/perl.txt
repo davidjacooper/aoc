@@ -1,0 +1,7 @@
+Day 12 with Perl
+================
+
+$ ./day12_part1 < input
+$ ./day12_part2 < input
+
+Thoughts: Perl's variables, arrays and maps are okay as far as they go, if a little esoteric. But other types of structured data seem like an afterthought. And _functions_, Perl. Where are my parameters?
