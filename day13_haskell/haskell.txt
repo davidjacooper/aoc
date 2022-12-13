@@ -1,0 +1,10 @@
+Day 13 with Haskell
+===================
+
+$ ghc Day13_Part1.hs -o day13_part1
+$ ./day13_part1 < input
+
+$ ghc Day13_Part2.hs -o day13_part2
+$ ./day13_part2 < input
+
+Thoughts: Haskell takes some getting used to, and this particular problem lends itself to all sorts of recursion, but ultimately it makes a lot of sense once you drag yourself over the learning curve.

@@ -6,6 +6,7 @@
 # Other compiled files
 *.class
 *.o
+*.hi
 
 # Other temp files
 *.swp
