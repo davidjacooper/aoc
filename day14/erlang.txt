@@ -1,9 +1,0 @@
-Day 14 with Erlang
-==================
-
-$ ./day14_part1.erl < input.txt
-$ ./day14_part2.erl < input.txt
-
-Thoughts: Erlang catches me out with certain language syntax (the use of colon, semicolon, comma and period) and constraints, particularly (for some reason) the inability of th 'if' expression to evaluate arbitrary boolean expressions, such as including the return value of another function. (It seems one must use a 'case' expression instead.)
-
-I also (evidently) engineered a rather inefficient solution to this problem -- inefficient almost to the point of not working -- not helped by being a novice at the language.
