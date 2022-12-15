@@ -1,0 +1,11 @@
+Day 15 with R
+=============
+
+./day15_part1.R < input
+./day15_part2.R < input
+
+Note: there are extra parameters in the code that must be changed when using 'simple_input'.
+
+Thoughts: I have used R extensively, but a long time ago. Its vector manipulation capabilities are
+amazing -- and lead to some very compact code -- but sometimes require so much careful 
+consideration that it might have been easier to just to everything with explicit loops.
