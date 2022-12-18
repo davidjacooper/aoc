@@ -1,0 +1,13 @@
+Day 18 in Dart
+==============
+
+$ dart compile exe day18_part1.dart
+$ ./day18_part1.exe < input
+
+OR
+$ dart run day18_part1.dart
+
+[And the same for part 2.]
+
+
+Thoughts: Dart is very Java/C#-like, and quite pleasant, though some things tripped me up; e.g., the integer division operator is "~/". I like the constructor assignment shortcut of putting "this.x" in the parameter list.
