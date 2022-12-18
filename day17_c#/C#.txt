@@ -1,0 +1,10 @@
+Day 17 in C#
+============
+
+Using Mono to compile and run:
+
+$ mcs Day17_Part1.cs
+$ mono Day17_Part1.exe < input
+
+$ mcs Day17_Part2.cs
+$ mono Day17_Part2.exe < input

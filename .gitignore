@@ -8,6 +8,7 @@
 *.o
 *.hi
 *.beam
+*.exe
 
 # Other temp files
 *.swp
