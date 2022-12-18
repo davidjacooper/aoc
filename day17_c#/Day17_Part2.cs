@@ -204,9 +204,9 @@ class Day17_Part2
             {
                 var interval = n - prevN;
                 
-                // Deduce the period of the height increases, by search for the longest repetition
-                // interval. Shorter intervals will be false positives, but there cannot be any
-                // intervals longer than the global period.
+                // Deduce the period of the height increases, by searching for the longest
+                // repetition interval. Shorter intervals will be false positives, but there cannot
+                // be any intervals longer than the global period.
                 if(period < interval)
                 {
                     period = interval;
