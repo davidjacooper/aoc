@@ -1,0 +1,7 @@
+# All files without dots
+*
+!*/
+!*.*
+
+# All input data
+*input*.txt
