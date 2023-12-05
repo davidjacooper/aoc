@@ -1,10 +1,17 @@
+use std::time::Instant;
+
 fn main()
 {
     let file = std::env::args().nth(1).unwrap_or("input1.txt".to_string());
     match std::fs::read_to_string(&file)
     {
         Err(err) => println!("Cannot read '{file}': {err}"),
-        Ok(content) => if_you_give_a_seed_a_fertilizer_part1(&content)
+        Ok(content) =>
+        {
+            let start = Instant::now();
+            if_you_give_a_seed_a_fertilizer_part1(&content);
+            println!("Time: {:?}", Instant::now().duration_since(start));
+        }
     }
 }
 
@@ -17,7 +24,7 @@ fn if_you_give_a_seed_a_fertilizer_part1(content: &str)
                                      .map(|s| s.parse().unwrap())
                                      .collect();
 
-    println!("numbers = {:?}", numbers);
+    //println!("numbers = {:?}", numbers);
 
     for map_str in map_list.split("\n\n")
     {
@@ -46,7 +53,7 @@ fn if_you_give_a_seed_a_fertilizer_part1(content: &str)
             }
         }
 
-        println!("numbers = {:?}", numbers);
+        //println!("numbers = {:?}", numbers);
     }
 
     println!("Minimum = {}", numbers.iter().min().unwrap());

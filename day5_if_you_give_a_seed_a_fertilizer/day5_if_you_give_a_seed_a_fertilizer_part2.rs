@@ -1,3 +1,4 @@
+use std::time::Instant;
 use std::collections::VecDeque;
 
 fn main()
@@ -6,7 +7,12 @@ fn main()
     match std::fs::read_to_string(&file)
     {
         Err(err) => println!("Cannot read '{file}': {err}"),
-        Ok(content) => if_you_give_a_seed_a_fertilizer_part2(&content)
+        Ok(content) =>
+        {
+            let start = Instant::now();
+            if_you_give_a_seed_a_fertilizer_part2(&content);
+            println!("Time: {:?}", Instant::now().duration_since(start));
+        }
     }
 }
 
@@ -23,7 +29,7 @@ fn if_you_give_a_seed_a_fertilizer_part2(content: &str)
              .map(|chunk| (chunk[0], chunk[1]))
              .collect();
 
-    println!("numbers = {:?}", numbers);
+    //println!("numbers = {:?}", numbers);
 
     for map_str in map_list.split("\n\n")
     {
@@ -75,11 +81,11 @@ fn if_you_give_a_seed_a_fertilizer_part2(content: &str)
         }
         numbers = next_numbers;
 
-        println!("numbers = {:?}", numbers);
+        //println!("numbers = {:?}", numbers);
     }
 
     println!("Minimum = {}", numbers.iter()
-                                    .map(|(start, range)| start)
+                                    .map(|(start, _)| start)
                                     .min()
                                     .unwrap());
 }
