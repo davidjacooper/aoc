@@ -33,7 +33,7 @@ fn haunted_wasteland_part1(content: &str)
         .map(|line| (&line[0..3], Node { left: &line[7..10], right: &line[12..15] }) )
         .collect();
 
-    println!("nodes = {:?}\n", nodes);
+    make_graph(&nodes);
 
     let mut n_steps = 0;
     let mut current = "AAA";
@@ -56,4 +56,27 @@ fn haunted_wasteland_part1(content: &str)
     }
 
     println!("\n\nn_steps = {n_steps}");
+}
+
+
+fn make_graph(nodes: &HashMap<&str,Node>)
+{
+    let mut graph = String::new();
+    graph.push_str("digraph {\n  overlap=false\n");
+    for name in nodes.keys()
+    {
+        graph.push_str(&format!("  {} [style=\"filled\",fillcolor=\"{}\"]\n",
+                                name,
+                                if name.ends_with("A") { "green" }
+                                else if name.ends_with("Z") { "red" }
+                                else { "white" }));
+    }
+    for (name, Node { left, right }) in nodes.iter()
+    {
+        graph.push_str(&format!("  {} -> {} [color=\"blue\"]\n", name, left));
+        graph.push_str(&format!("  {} -> {} [color=\"magenta\"]\n", name, right));
+    }
+    graph.push_str("}\n");
+    let _ = std::fs::write("graph.dot", graph);
+    println!("graphviz... {:?}", std::process::Command::new("neato").args(["-Tpdf", "-O", "graph.dot"]).output());
 }

@@ -77,6 +77,6 @@ fn haunted_wasteland_part2(content: &str)
             factors.insert(sub_cycle);
         }
     }
-
+    println!("prime factors = {:?}", factors);
     println!("total steps = {}", factors.iter().product::<i64>());
 }
