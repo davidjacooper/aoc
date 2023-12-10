@@ -78,7 +78,16 @@ fn pipe_maze_part1(content: &str)
             }
             else if path_set.contains(&(i, j))
             {
-                print!("\x1b[44;1m{}\x1b[m", ch);
+                print!("\x1b[44;1m{}\x1b[m", match ch
+                {
+                    '|' => '│',
+                    '-' => '─',
+                    '7' => '╮',
+                    'F' => '╭',
+                    'J' => '╯',
+                    'L' => '╰',
+                    _ => *ch,
+                });
             }
             else
             {
