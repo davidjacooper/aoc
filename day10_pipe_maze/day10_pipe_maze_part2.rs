@@ -11,7 +11,7 @@ fn main()
         Ok(content) =>
         {
             let start = Instant::now();
-            pipe_maze_part1(&content);
+            pipe_maze_part2(&content);
             println!("---\ntime: {:?}", Instant::now().duration_since(start));
         }
     }
@@ -20,7 +20,7 @@ fn main()
 enum Dir { Up, Down, Left, Right }
 enum InOut { Outside, Inside, TopLine, BottomLine }
 
-fn pipe_maze_part1(content: &str)
+fn pipe_maze_part2(content: &str)
 {
     let mut grid: Vec<Vec<char>> =
         content
