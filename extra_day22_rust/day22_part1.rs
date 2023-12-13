@@ -45,7 +45,6 @@ fn monkey_map_part1(content: &str)
     let mut i = 1;
     let mut j = board[1].iter().position(|c| *c == '.').unwrap();
     let mut dir = Direction::Right;
-    println!("start=({i},{j})");
 
     use Direction::*;
 
@@ -54,7 +53,7 @@ fn monkey_map_part1(content: &str)
         let turn = step.chars().last().unwrap();
         let mut dist = step.trim_end_matches(&['R', 'L']).parse::<usize>().unwrap();
 
-        print!("{dist}-{turn}, from ({i},{j}:{:?}) to... ", dir);
+        //print!("{dist}-{turn}, from ({i},{j}:{:?}) to... ", dir);
         while dist > 0
         {
             let (mut i2, mut j2) = (i, j);
@@ -94,7 +93,7 @@ fn monkey_map_part1(content: &str)
             (Up,    'R') | (Down,  'L') => Right,
             _ => dir
         };
-        println!("({i},{j}:{:?})", dir);
+        //println!("({i},{j}:{:?})", dir);
     }
 
     // 1-based row/col numbering (in the prob statement) cancels out padding rows and cols.
