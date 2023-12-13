@@ -19,9 +19,63 @@ fn main()
 #[derive(Copy,Clone,Eq,PartialEq,Hash,Debug)]
 enum Direction { Right, Down, Left, Up }
 
-#[derive(Copy,Clone,Eq,PartialEq,Debug)]
-enum Turn { TurnRight, TurnLeft }
+#[derive(Copy,Clone,Eq,PartialEq,Hash,Debug)]
+struct Position
+{
+    i: usize,
+    j: usize,
+    dir: Direction
+}
 
+impl Position
+{
+    fn move_n(&self, n: isize) -> Position
+    {
+        use Direction::*;
+        return match self.dir
+        {
+            Right => Position { i: self.i, j: self.j.wrapping_add_signed(n), dir: self.dir },
+            Down  => Position { i: self.i.wrapping_add_signed(n), j: self.j, dir: self.dir },
+            Left  => Position { i: self.i, j: self.j.wrapping_add_signed(-n), dir: self.dir },
+            Up    => Position { i: self.i.wrapping_add_signed(-n), j: self.j, dir: self.dir },
+        }
+    }
+
+    fn turn_left(&self) -> Position
+    {
+        use Direction::*;
+        return Position {
+            i: self.i,
+            j: self.j,
+            dir: match self.dir { Left => Down, Up => Left, Right => Up, Down => Right }
+        }
+    }
+
+    fn turn_right(&self) -> Position
+    {
+        use Direction::*;
+        return Position {
+            i: self.i,
+            j: self.j,
+            dir: match self.dir { Left => Up, Up => Right, Right => Down, Down => Left }
+        }
+    }
+
+    fn turn_around(&self) -> Position
+    {
+        use Direction::*;
+        return Position {
+            i: self.i,
+            j: self.j,
+            dir: match self.dir { Left => Right, Up => Down, Right => Left, Down => Up }
+        }
+    }
+
+    fn same_place_as(&self, other: &Position) -> bool
+    {
+        return self.i == other.i && self.j == other.j
+    }
+}
 
 fn monkey_map_part2(content: &str)
 {
@@ -45,14 +99,15 @@ fn monkey_map_part2(content: &str)
     board.insert(0, vec![' '; width + 2]);
     board.push(vec![' '; width + 2]);
 
+    let mut pos = Position {
+        i: 1,
+        j: board[1].iter().position(|c| *c == '.').unwrap(),
+        dir: Direction::Right
+    };
 
-    let mut i = 1;
-    let mut j = board[1].iter().position(|c| *c == '.').unwrap();
-    let mut dir = Direction::Right;
-
-    let perimeter = find_perimeter(&board, i, j, dir);
+    let perimeter = find_perimeter(&board, pos);
     print_board(&board, &perimeter);
-    let p_map = perimeter_map(perimeter);
+    let perimeter_map = create_perimeter_map(perimeter);
 
     use Direction::*;
 
@@ -61,46 +116,45 @@ fn monkey_map_part2(content: &str)
         let turn_ch = step.chars().last().unwrap();
         let mut dist = step.trim_end_matches(&['R', 'L']).parse::<usize>().unwrap();
 
-        //print!("{dist}-{turn_ch}, from ({i},{j}:{:?}) to... ", dir);
         while dist > 0
         {
-            let (mut i2, mut j2) = move_n(i, j, 1, dir);
-            let mut dir2 = dir;
+            let mut pos2 = pos.move_n(1);
 
-            if board[i2][j2] == ' '
+            if board[pos2.i][pos2.j] == ' '
             {
-                (i2, j2, dir2) = p_map.get(&(i2, j2, dir2)).unwrap().clone();
+                pos2 = *perimeter_map.get(&pos2).unwrap();
             }
 
-            if board[i2][j2] == '#'
+            if board[pos2.i][pos2.j] == '#'
             {
                 break;
             }
 
-            (i, j, dir) = (i2, j2, dir2);
+            pos = pos2;
             dist -= 1;
         }
 
-        match turn_ch
+        pos = match turn_ch
         {
-            'R' => dir = turn(dir, Turn::TurnRight),
-            'L' => dir = turn(dir, Turn::TurnLeft),
-            _ => {}
-        }
-        //println!("**({i},{j}:{:?})**", dir);
+            'R' => pos.turn_right(),
+            'L' => pos.turn_left(),
+            _ => pos
+        };
     }
 
     // 1-based row/col numbering (in the prob statement) cancels out padding rows and cols.
-    println!("Final position: ({i},{j},{:?})", dir);
-    println!("Password = {}", 1000 * i + 4 * j + match dir { Right => 0, Down => 1, Left => 2, Up => 3 });
-
+    println!("{:?}", pos);
+    println!("Password = {}", 1000 * pos.i + 4 * pos.j + match pos.dir { Right => 0, Down => 1, Left => 2, Up => 3 });
 }
 
-fn print_board(board: &Vec<Vec<char>>, perimeter: &Vec<(usize,usize,Direction)>)
+fn print_board(board: &Vec<Vec<char>>, perimeter: &Vec<Position>)
 {
     let perim_set = perimeter
         .iter()
-        .map(|(i,j,dir)| move_n(*i, *j, 1, *dir))
+        .map(|pos| {
+            let Position { i, j, dir: _ } = pos.move_n(1);
+            return (i, j)
+        })
         .collect::<HashSet<(usize,usize)>>();
 
     print!("      ");
@@ -128,77 +182,31 @@ fn print_board(board: &Vec<Vec<char>>, perimeter: &Vec<(usize,usize,Direction)>)
     }
 }
 
-fn move_n(i: usize, j: usize, n: isize, dir: Direction) -> (usize,usize)
+fn find_perimeter(board: &Vec<Vec<char>>, start_pos: Position) -> Vec<Position>
 {
-    use Direction::*;
-    return match dir
-    {
-        Right => (i, j.wrapping_add_signed(n)),
-        Down  => (i.wrapping_add_signed(n), j),
-        Left  => (i, j.wrapping_add_signed(-n)),
-        Up    => (i.wrapping_add_signed(-n), j)
-    }
-}
-
-fn turn(dir: Direction, which_turn: Turn) -> Direction
-{
-    use Direction::*;
-    use Turn::*;
-    return match (dir, which_turn)
-    {
-        (Right, TurnRight) | (Left,  TurnLeft) => Down,
-        (Down,  TurnRight) | (Up,    TurnLeft) => Left,
-        (Left,  TurnRight) | (Right, TurnLeft) => Up,
-        (Up,    TurnRight) | (Down,  TurnLeft) => Right,
-    };
-}
-
-fn find_perimeter(board: &Vec<Vec<char>>,
-                  start_i: usize,
-                  start_j: usize,
-                  start_dir: Direction) -> Vec<(usize,usize,Direction)>
-{
-    use Turn::*;
-
-    let mut perimeter = Vec::<(usize,usize,Direction)>::new();
-
-    let (mut i, mut j, mut dir) = (start_i, start_j, start_dir);
+    let mut perimeter = Vec::<Position>::new();
+    let mut pos = start_pos;
     loop
     {
-        let left = turn(dir, TurnLeft);
-        perimeter.push((i, j, left));
-        let (i2, j2) = move_n(i, j, 1, dir);
-        let (i3, j3) = move_n(i2, j2, 1, left);
+        perimeter.push(pos.turn_left());
+        let pos_ahead = pos.move_n(1);
+        let pos_left = pos_ahead.turn_left().move_n(1);
 
-        if board[i3][j3] != ' ' // Turn left
-        {
-            (i, j) = (i3, j3);
-            dir = left;
-        }
-        else if board[i2][j2] == ' ' // Turn right, keep existing (i,j)
-        {
-            dir = turn(dir, TurnRight);
-        }
-        else
-        {
-            (i, j) = (i2, j2);
-        }
+        pos = if board[pos_left.i][pos_left.j] != ' '        { pos_left }
+              else if board[pos_ahead.i][pos_ahead.j] == ' ' { pos.turn_right() }
+              else                                           { pos_ahead };
 
-        if (i, j, dir) == (start_i, start_j, start_dir)
-        {
-            break;
-        }
+        if pos == start_pos { break }
     }
     return perimeter;
 }
 
-fn perimeter_map(mut perimeter: Vec<(usize,usize,Direction)>) ->
-    HashMap<(usize,usize,Direction),(usize,usize,Direction)>
+fn create_perimeter_map(mut perimeter: Vec<Position>) -> HashMap<Position,Position>
 {
-    let mut map = HashMap::<(usize,usize,Direction),(usize,usize,Direction)>::new();
+    let mut map = HashMap::<Position,Position>::new();
     loop
     {
-        let (mut prev_i, mut prev_j, mut prev_dir) = perimeter.last().unwrap();
+        let mut prev_pos = perimeter.last().unwrap();
 
         // n1 and n2 track the indexes that make up the 'zipper'. They must start together at a
         // concave vertex, which we must locate first. (A cube template must have at least two of these.)
@@ -207,54 +215,36 @@ fn perimeter_map(mut perimeter: Vec<(usize,usize,Direction)>) ->
         let mut n1 = perimeter.len() - 1;
         let mut n2 = 0;
         let mut found = false;
-        for (n, (i, j, dir)) in perimeter.iter().enumerate()
+        for (n, pos) in perimeter.iter().enumerate()
         {
-            if move_n(prev_i, prev_j, 1, prev_dir) == move_n(*i, *j, 1, *dir)
+            if prev_pos.move_n(1).same_place_as(&pos.move_n(1))
             {
                 n2 = n;
                 found = true;
                 break;
             }
-            (n1, prev_i, prev_j, prev_dir) = (n, *i, *j, *dir);
+            (n1, prev_pos) = (n, pos);
         }
         if !found { panic!() }
 
-        let (mut i1, mut j1, mut dir1) = perimeter[n1];
-        let (mut i2, mut j2, mut dir2) = perimeter[n2];
         loop
         {
-            let (outer_i1, outer_j1) = move_n(i1, j1, 1, dir1);
-            let (outer_i2, outer_j2) = move_n(i2, j2, 1, dir2);
+            let pos1 = perimeter[n1];
+            let pos2 = perimeter[n2];
+            map.insert(pos1.move_n(1), pos2.turn_around());
+            map.insert(pos2.move_n(1), pos1.turn_around());
 
-            use Turn::*;
-            map.insert((outer_i1, outer_j1, dir1), (i2, j2, turn(turn(dir2, TurnLeft), TurnLeft)));
-            map.insert((outer_i2, outer_j2, dir2), (i1, j1, turn(turn(dir1, TurnLeft), TurnLeft)));
-
-            let next_n1 = if n1 == 0         { len - 1 } else { n1 - 1 };
-            let next_n2 = if n2 == (len - 1) { 0 }       else { n2 + 1 };
+            let next_n1 = n1.checked_sub(1).unwrap_or(len - 1);
+            let next_n2 = (n2 + 1) % len;
             if next_n1 == n2
             {
-                // Both sides of the 'zipper' have met back up, which means we're done.
-                return map;
+                return map; // Both sides of the 'zipper' have met back up, which means we're done.
             }
-
-
-            if next_n1 == next_n2 { panic!() } // The indexes should never be equal, because that
-                                               // implies an unmappable bit of perimeter.
-
-            let (next_i1, next_j1, next_dir1) = perimeter[next_n1];
-            let (next_i2, next_j2, next_dir2) = perimeter[next_n2];
-            if (next_i1, next_j1, next_i2, next_j2) == (i1, j1, i2, j2)
+            if pos1.same_place_as(&perimeter[next_n1]) && pos2.same_place_as(&perimeter[next_n2])
             {
-                // Both sides of the 'zipper' encounter a convex vertex at the same time, which we
-                // detect because the perimeter points on either side of such a vertex have the
-                // same (i,j) coordinates.
-                //
-                // This is as far as this 'zipper' can go.
-                break;
+                break; // This is as far as this 'zipper' can go.
             }
-            (n1, i1, j1, dir1, n2, i2, j2, dir2) = (next_n1, next_i1, next_j1, next_dir1,
-                                                    next_n2, next_i2, next_j2, next_dir2);
+            (n1, n2) = (next_n1, next_n2);
         }
 
         // Delete the now 'zipped-up' part of the perimeter.
