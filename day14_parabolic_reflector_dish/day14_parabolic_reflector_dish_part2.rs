@@ -26,7 +26,6 @@ fn parabolic_reflector_dish_part1(content: &str)
 
     //print_platform(&platform);
 
-    let orig_platform = platform.clone();
     let mut prev_states = HashMap::<Vec<u128>,u64>::new();
     prev_states.insert(calc_state(&platform), 0);
 
@@ -53,12 +52,11 @@ fn parabolic_reflector_dish_part1(content: &str)
 
     println!("cycles = {cycles}, repeat_from = {repeat_from}");
 
-    // Then, we reset everything, and run only to the point that should be
-    // equivalent to the target number of cycles.
+    // Then, since we're at the 'start' of one of the repeating-sequences, we
+    // just work out how far through the equivalent of 1000000000 is.
 
-    platform = orig_platform;
     let target = 1000000000;
-    for _ in 0..(repeat_from + (target - repeat_from) % (cycles - repeat_from))
+    for _ in 0..((target - repeat_from) % (cycles - repeat_from))
     {
         cycle(&mut platform);
     }
