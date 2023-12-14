@@ -10,13 +10,13 @@ fn main()
         Ok(content) =>
         {
             let start = Instant::now();
-            parabolic_reflector_dish_part1(&content);
+            parabolic_reflector_dish_part2(&content);
             println!("---\ntime: {:?}", Instant::now().duration_since(start));
         }
     }
 }
 
-fn parabolic_reflector_dish_part1(content: &str)
+fn parabolic_reflector_dish_part2(content: &str)
 {
     let mut platform = content
         .trim()
