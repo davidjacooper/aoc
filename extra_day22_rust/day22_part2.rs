@@ -27,47 +27,31 @@ struct Position
     dir: Direction
 }
 
+use Direction::*;
 impl Position
 {
     fn move_n(&self, n: isize) -> Position
     {
-        use Direction::*;
         return match self.dir
         {
-            Right => Position { i: self.i, j: self.j.wrapping_add_signed(n), dir: self.dir },
-            Down  => Position { i: self.i.wrapping_add_signed(n), j: self.j, dir: self.dir },
-            Left  => Position { i: self.i, j: self.j.wrapping_add_signed(-n), dir: self.dir },
-            Up    => Position { i: self.i.wrapping_add_signed(-n), j: self.j, dir: self.dir },
+            Right => Position { j: self.j.wrapping_add_signed(n), ..*self },
+            Down  => Position { i: self.i.wrapping_add_signed(n), ..*self },
+            Left  => Position { j: self.j.wrapping_add_signed(-n), ..*self },
+            Up    => Position { i: self.i.wrapping_add_signed(-n), ..*self },
         }
     }
 
-    fn turn_left(&self) -> Position
+    fn dir_n(&self) -> i8
     {
-        use Direction::*;
-        return Position {
-            i: self.i,
-            j: self.j,
-            dir: match self.dir { Left => Down, Up => Left, Right => Up, Down => Right }
-        }
+        return match self.dir { Right=>0, Down=>1, Left=>2, Up=>3 }
     }
 
-    fn turn_right(&self) -> Position
+    fn turn(&self, n: i8) -> Position
     {
-        use Direction::*;
         return Position {
-            i: self.i,
-            j: self.j,
-            dir: match self.dir { Left => Up, Up => Right, Right => Down, Down => Left }
-        }
-    }
-
-    fn turn_around(&self) -> Position
-    {
-        use Direction::*;
-        return Position {
-            i: self.i,
-            j: self.j,
-            dir: match self.dir { Left => Right, Up => Down, Right => Left, Down => Up }
+            dir: match (self.dir_n() + n).rem_euclid(4) { 0=>Right, 1=>Down, 2=>Left, 3=>Up,
+                                                          _=>panic!() },
+            ..*self
         }
     }
 
@@ -102,14 +86,12 @@ fn monkey_map_part2(content: &str)
     let mut pos = Position {
         i: 1,
         j: board[1].iter().position(|c| *c == '.').unwrap(),
-        dir: Direction::Right
+        dir: Right
     };
 
     let perimeter = find_perimeter(&board, pos);
     print_board(&board, &perimeter);
     let perimeter_map = create_perimeter_map(perimeter);
-
-    use Direction::*;
 
     for step in step_str.trim().split_inclusive(&['R', 'L'])
     {
@@ -136,15 +118,15 @@ fn monkey_map_part2(content: &str)
 
         pos = match turn_ch
         {
-            'R' => pos.turn_right(),
-            'L' => pos.turn_left(),
+            'R' => pos.turn(1),
+            'L' => pos.turn(-1),
             _ => pos
         };
     }
 
     // 1-based row/col numbering (in the prob statement) cancels out padding rows and cols.
     println!("{:?}", pos);
-    println!("Password = {}", 1000 * pos.i + 4 * pos.j + match pos.dir { Right => 0, Down => 1, Left => 2, Up => 3 });
+    println!("Password = {}", 1000 * pos.i + 4 * pos.j + pos.dir_n() as usize);
 }
 
 fn print_board(board: &Vec<Vec<char>>, perimeter: &Vec<Position>)
@@ -188,12 +170,12 @@ fn find_perimeter(board: &Vec<Vec<char>>, start_pos: Position) -> Vec<Position>
     let mut pos = start_pos;
     loop
     {
-        perimeter.push(pos.turn_left());
+        perimeter.push(pos.turn(-1));
         let pos_ahead = pos.move_n(1);
-        let pos_left = pos_ahead.turn_left().move_n(1);
+        let pos_left = pos_ahead.turn(-1).move_n(1);
 
         pos = if board[pos_left.i][pos_left.j] != ' '        { pos_left }
-              else if board[pos_ahead.i][pos_ahead.j] == ' ' { pos.turn_right() }
+              else if board[pos_ahead.i][pos_ahead.j] == ' ' { pos.turn(1) } // right
               else                                           { pos_ahead };
 
         if pos == start_pos { break }
@@ -231,8 +213,8 @@ fn create_perimeter_map(mut perimeter: Vec<Position>) -> HashMap<Position,Positi
         {
             let pos1 = perimeter[n1];
             let pos2 = perimeter[n2];
-            map.insert(pos1.move_n(1), pos2.turn_around());
-            map.insert(pos2.move_n(1), pos1.turn_around());
+            map.insert(pos1.move_n(1), pos2.turn(2)); // 180 deg
+            map.insert(pos2.move_n(1), pos1.turn(2));
 
             let next_n1 = n1.checked_sub(1).unwrap_or(len - 1);
             let next_n2 = (n2 + 1) % len;
