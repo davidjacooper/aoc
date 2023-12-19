@@ -1,6 +1,5 @@
 use std::time::Instant;
 use std::collections::HashMap;
-use std::cmp::{min,max};
 
 fn main()
 {
@@ -76,45 +75,34 @@ fn lavaduct_lagoon_part2(content: &str)
         })
         .collect();
 
-
     let mut points = HashMap::<i64,Vec<Point>>::new();
+    let mut verticals = Vec::<(i64, i64, i64)>::new();
+
     let mut cur_i = 0;
     let mut cur_j = 0;
-    let mut min_i = 0;
-    let mut max_i = 0;
     let mut prev_dir: Direction = input.last().unwrap().0;
-
-    println!("{:?}", input);
 
     for (dir, dist) in input
     {
-        println!("{:?}->{:?} {dist}", prev_dir, dir);
-
         match dir
         {
             Up =>
             {
-                for i in (cur_i - dist)..=(cur_i)
-                {
-                    points.entry(i).or_insert_with(|| Vec::new());
-                }
-
-                points.get_mut(&cur_i).unwrap().push(
+                points.entry(cur_i).or_insert_with(|| Vec::new()).push(
                     Point {
                         j: cur_j,
                         line: match prev_dir { Right => UpLeft, Left => UpRight, _ => panic!() }
                     });
 
-                for i in (cur_i - dist + 1)..(cur_i)
-                {
-                    points.get_mut(&i).unwrap().push(
-                        Point {
-                            j: cur_j,
-                            line: Vertical
-                        });
-                }
+                points.entry(cur_i - dist + 1).or_insert_with(|| Vec::new()).push(
+                    Point {
+                        j: cur_j,
+                        line: Vertical
+                    });
+
+                verticals.push((cur_i - dist + 2, cur_i - 1, cur_j));
+
                 cur_i -= dist;
-                min_i = min(min_i, cur_i);
             }
             Right =>
             {
@@ -127,27 +115,21 @@ fn lavaduct_lagoon_part2(content: &str)
             }
             Down =>
             {
-                for i in cur_i..=(cur_i + dist)
-                {
-                    points.entry(i).or_insert_with(|| Vec::new());
-                }
-
-                points.get_mut(&cur_i).unwrap().push(
+                points.entry(cur_i).or_insert_with(|| Vec::new()).push(
                     Point {
                         j: cur_j,
                         line: match prev_dir { Right => DownLeft, Left => DownRight, _ => panic!() }
                     });
 
-                for i in (cur_i + 1)..(cur_i + dist)
-                {
-                    points.get_mut(&i).unwrap().push(
-                        Point {
-                            j: cur_j,
-                            line: Vertical
-                        });
-                }
+                points.entry(cur_i + 1).or_insert_with(|| Vec::new()).push(
+                    Point {
+                        j: cur_j,
+                        line: Vertical
+                    });
+
+                verticals.push((cur_i + 2, cur_i + dist - 1, cur_j));
+
                 cur_i += dist;
-                max_i = max(max_i, cur_i);
             }
             Left =>
             {
@@ -162,20 +144,43 @@ fn lavaduct_lagoon_part2(content: &str)
         prev_dir = dir;
     }
 
+    // Create an extra row underneath every existing row, so that we can fill them with verticals.
+    for i in points.keys().copied().collect::<Vec<i64>>()
+    {
+        points.entry(i + 1).or_insert_with(|| Vec::new());
+    }
+
+    // Fill in the verticals on all existing rows.
+    for (i, row) in points.iter_mut()
+    {
+        for (vert_i1, vert_i2, vert_j) in verticals.iter()
+        {
+            if vert_i1 <= i && i <= vert_i2
+            {
+                row.push(Point { j: *vert_j, line: Vertical });
+            }
+        }
+    }
+
+    let mut row_indexes = points.keys().map(|&k| k).collect::<Vec<i64>>();
+    row_indexes.sort();
+
+    let mut prev_i = row_indexes[0] - 1;
+    let mut prev_row_area = 0;
     let mut area = 0;
 
-    for i in min_i..=max_i
+    for i in row_indexes
     {
         let row = points.get_mut(&i).unwrap();
         row.sort();
-        if i % 10000 == 0
-        {
-            println!("i={i}: {:?}", row);
-        }
+
+        let d_area = (i - prev_i - 1) * prev_row_area;
+        area += d_area;
 
         use InOut::*;
         let mut in_out = Outside;
         let mut start_j = 0;
+        let mut row_area = 0;
 
         for Point{j, line} in row.iter()
         {
@@ -196,9 +201,18 @@ fn lavaduct_lagoon_part2(content: &str)
             if in_out == Outside
             {
                 let d_area = j - start_j + 1;
-                area += d_area;
+                row_area += d_area;
             }
         }
+
+        if in_out != Outside
+        {
+            panic!();
+        }
+
+        area += row_area;
+        prev_row_area = row_area;
+        prev_i = i;
     }
 
     println!("area = {area}");
