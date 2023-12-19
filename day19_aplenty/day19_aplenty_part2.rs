@@ -1,5 +1,6 @@
 use std::time::Instant;
 use std::collections::HashMap;
+use std::cmp::{min,max};
 
 fn main()
 {
@@ -10,7 +11,7 @@ fn main()
         Ok(content) =>
         {
             let start = Instant::now();
-            aplenty_part1(&content);
+            aplenty_part2(&content);
             println!("---\ntime: {:?}", Instant::now().duration_since(start));
         }
     }
@@ -72,7 +73,6 @@ impl Dest<'_>
     }
 }
 
-
 #[derive(Debug)]
 struct Rule<'a>
 {
@@ -82,37 +82,15 @@ struct Rule<'a>
     dest: Dest<'a>
 }
 
-impl Rule<'_>
-{
-    fn matches(&self, x: i64, m: i64, a: i64, s: i64) -> bool
-    {
-        let val = match self.var { Var::X => x, Var::M => m, Var::A => a, Var::S => s };
-        return match self.rel
-        {
-            Rel::Greater => val > self.amount,
-            Rel::Less    => val < self.amount
-        }
-    }
-}
-
-
-struct Combo
-{
-    values: HashMap<Var,(i64,i64)>,
-}
-
-
-
 #[derive(Debug)]
 struct Workflow<'a>
 {
-    name: &'a str,
     rules: Vec<Rule<'a>>,
     dest: Dest<'a>
 }
 
 
-fn aplenty_part1(content: &str)
+fn aplenty_part2(content: &str)
 {
     let (workflows_str, _) = content.trim_end().split_once("\n\n").unwrap();
 
@@ -147,51 +125,56 @@ fn aplenty_part1(content: &str)
         })
         .collect();
 
-    let queue = VecDeque::<Combo
+    let n_combinations = find_combinations(
+        &workflows, Dest::Goto("in"), [(1, 4000), (1, 4000), (1, 4000), (1, 4000)]);
 
-    // let mut sum = 0;
-    // for line in ratings_str.lines()
-    // {
-    //     // let values = line[1..(line.len() - 1)]
-    //     //     .split(',')
-    //     //     .map(|s| s[2..].parse().unwrap())
-    //     //     .collect::<Vec<i64>>();
-    //     //
-    //     // let [x, m, a, s] = &values[..] else { panic!() };
-    //     // print!("x={x}, m={m}, a={a}, s={s}: ");
-    //
-    //     let mut workflow = workflows.get("in").unwrap();
-    //
-    //     loop
-    //     {
-    //         match workflow.rules
-    //             .iter()
-    //             .filter_map(|rule|
-    //                 if rule.matches(*x, *m, *a, *s) { Some(rule.dest) }
-    //                 else                            { None }
-    //             )
-    //             .nth(0)
-    //             .unwrap_or(workflow.dest)
-    //         {
-    //             Dest::Accept =>
-    //             {
-    //                 println!("Accepted");
-    //                 sum += x + m + a + s;
-    //                 break;
-    //             }
-    //             Dest::Reject =>
-    //             {
-    //                 println!("Rejected");
-    //                 break;
-    //             }
-    //             Dest::Goto(name) =>
-    //             {
-    //                 workflow = workflows.get(name).unwrap();
-    //             }
-    //         }
-    //     }
-    // }
+    println!("#combinations = {n_combinations}");
 
-    println!("sum = {sum}");
 }
 
+
+fn find_combinations(workflows: &HashMap<&str,Workflow>,
+                     dest: Dest,
+                     mut values: [(i64,i64);4]) -> i64
+{
+    if values.iter().any(|(a, b)| a > b)
+    {
+        return 0;
+    }
+
+    return match dest
+    {
+        Dest::Accept => values.iter().map(|(a, b)| b - a + 1).product(),
+        Dest::Reject => 0,
+        Dest::Goto(name) =>
+        {
+            let workflow = workflows.get(name).unwrap();
+            let mut combos = 0;
+
+            for rule in workflow.rules.iter()
+            {
+                let mut new_values = values.clone();
+                let index = match rule.var { Var::X => 0,
+                                             Var::M => 1,
+                                             Var::A => 2,
+                                             Var::S => 3 };
+
+                match rule.rel
+                {
+                    Rel::Greater => {
+                        new_values[index].0 = max(new_values[index].0, rule.amount + 1);
+                        values[index].1     = min(values[index].1,     rule.amount);
+                    }
+                    Rel::Less => {
+                        new_values[index].1 = min(new_values[index].1, rule.amount - 1);
+                        values[index].0     = max(values[index].0,     rule.amount);
+                    }
+                }
+
+                combos += find_combinations(workflows, rule.dest, new_values);
+            }
+
+            combos + find_combinations(workflows, workflow.dest, values)
+        }
+    }
+}
