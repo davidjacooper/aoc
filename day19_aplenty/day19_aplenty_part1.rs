@@ -71,6 +71,16 @@ impl Dest<'_>
             _   => Dest::Goto(s)
         }
     }
+
+    fn name(&self) -> &str
+    {
+        return match self
+        {
+            Dest::Accept => "A",
+            Dest::Reject => "R",
+            Dest::Goto(s) => s
+        }
+    }
 }
 
 
@@ -140,6 +150,8 @@ fn aplenty_part1(content: &str)
         })
         .collect();
 
+    make_graph(&workflows);
+
     let mut sum = 0;
     for line in ratings_str.lines()
     {
@@ -186,3 +198,29 @@ fn aplenty_part1(content: &str)
     println!("sum = {sum}");
 }
 
+fn make_graph(workflows: &HashMap<&str,Workflow>)
+{
+    let mut graph = String::new();
+    graph.push_str("digraph {\n  overlap=false\n");
+    graph.push_str("  A [style=\"filled\",fillcolor=\"green\"]");
+    graph.push_str("  R [style=\"filled\",fillcolor=\"red\"]");
+    for name in workflows.keys()
+    {
+        graph.push_str(&format!("  {} [style=\"filled\",fillcolor=\"{}\"]\n",
+                                name,
+                                if *name == "in" { "yellow" }
+                                else             { "white" }));
+    }
+    for (name, Workflow { rules, dest, .. }) in workflows.iter()
+    {
+        graph.push_str(&format!("  {} -> {} [color=\"blue\"]\n", name, dest.name() ));
+
+        for Rule { dest, .. } in rules.iter()
+        {
+            graph.push_str(&format!("  {} -> {} [color=\"magenta\"]\n", name, dest.name() ));
+        }
+    }
+    graph.push_str("}\n");
+    let _ = std::fs::write("graph.dot", graph);
+    println!("graphviz... {:?}", std::process::Command::new("dot").args(["-Tpdf", "-O", "graph.dot"]).output());
+}
