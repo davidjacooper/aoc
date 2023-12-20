@@ -1,5 +1,6 @@
 use std::time::Instant;
 use std::collections::HashMap;
+use std::io::Write;
 
 fn main()
 {
@@ -74,6 +75,8 @@ fn lavaduct_lagoon_part2(content: &str)
             )
         })
         .collect();
+
+    make_svg(&input).unwrap();
 
     let mut points = HashMap::<i64,Vec<Point>>::new();
     let mut verticals = Vec::<(i64, i64, i64)>::new();
@@ -217,3 +220,50 @@ fn lavaduct_lagoon_part2(content: &str)
 
     println!("area = {area}");
 }
+
+fn make_svg(input: &Vec<(Direction,i64)>) -> std::io::Result<()>
+{
+    let mut polygon_points = Vec::<(f64,f64)>::new();
+    let mut i = 0.0;
+    let mut j = 0.0;
+    let mut min_i: f64 = 0.0;
+    let mut min_j: f64 = 0.0;
+    let mut max_i: f64 = 0.0;
+    let mut max_j: f64 = 0.0;
+    for (dir, dist) in input.iter()
+    {
+        let fdist = (*dist as f64) / 5000.0;
+        polygon_points.push((i, j));
+        match dir {
+            Down => {
+                i -= fdist;
+                min_i = min_i.min(i);
+            }
+            Right => {
+                j += fdist;
+                max_j = max_j.max(j);
+            }
+            Up => {
+                i += fdist;
+                max_i = max_i.max(i);
+            }
+            Left => {
+                j -= fdist;
+                min_j = min_j.min(j);
+            }
+        }
+    }
+
+    let mut out = std::fs::File::create("part2_lagoon_shape.svg")?;
+    writeln!(out, r#"<?xml version="1.0" encoding="UTF-8" ?>"#)?;
+    writeln!(out,
+             r#"<svg viewBox="{} {} {} {}" xmlns="http://www.w3.org/2000/svg">"#,
+             min_j - 10.0, min_i - 10.0, max_j - min_j + 20.0, max_i - min_i + 20.0)?;
+
+    writeln!(out, r##"<polygon points="{}" fill="#C0D8FF" stroke="black" stroke-width="1"/>"##,
+           polygon_points.iter().map(|(i, j)| format!("{j},{i}")).collect::<Vec<String>>().join(" "))?;
+
+    writeln!(out, r#"</svg>"#)?;
+    Ok(())
+}
+
