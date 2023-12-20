@@ -1,0 +1,14 @@
+Day 20 "Pulse Propagation" part 2
+=================================
+
+I haven't solved this for the general case, but I did solve it for the given input data, as follows.
+
+First, plotting the graph visually turned out to be essential. The visualisation let me see that the graph is more-or-less evenly divided into four nearly isolated components, each having a particular key node (a "conjugation module", in the terminology of the problem). The 4 key nodes combine to determine the overall output (of the "rx" node).
+
+The 4 key nodes emit "high pulses" almost all the time, leading (indirectly) to the "rx" node also producing a high pulse.
+
+I wrote some quick-and-dirty code to establish when (in terms of "button" presses) each of the 4 key nodes output a "low pulse". For each, it takes N_i button presses to get it to emit a low pulse. They must do so together in order for "rx" to emit a low pulse.
+
+Since all N_i turn out to be prime numbers, they can simply be multiplied together to get the final answer.
+
+(Strictly speaking, we want to work out the cycle length for each key node, not just the time of the first low pulse, but this turns out to be the same. Possibly the input data has also been specially engineered to achieve this.)
