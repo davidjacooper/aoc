@@ -75,8 +75,8 @@ fn step_counter_part1(content: &str) -> Result<(), &str>
                 {
                     if ch == 'S'
                     {
-                        start_i = i + 1;
-                        start_j = j + 1;
+                        start_i = i;
+                        start_j = j;
                     }
                     if ch != '#' { Passable } else { Rock }
                 })
@@ -91,20 +91,98 @@ fn step_counter_part1(content: &str) -> Result<(), &str>
     grid.insert(0, vec![Rock; width]);
     grid.push(vec![Rock; width]);
 
+    // // To get the diamond in the middle
+    // const MAX_STEPS: usize = 65;
+
+    // To get the entire block
+    const MAX_STEPS: usize = 131;
+
+
+    // // To get the top-left triangle
+    // (start_i, start_j) = (0, 0);
+    // const MAX_STEPS: usize = 64;
+    // // (look at the inverted output)
+
+    // // To get the top-right triangle
+    // (start_i, start_j) = (0, 130);
+    // const MAX_STEPS: usize = 64;
+    // // (look at the inverted output)
+
+    // // To get the bottom-left triangle
+    // (start_i, start_j) = (130, 0);
+    // const MAX_STEPS: usize = 64;
+    // // (look at the inverted output)
+
+    // // To get the bottom-right triangle
+    // (start_i, start_j) = (130, 130);
+    // const MAX_STEPS: usize = 64;
+    // // (look at the inverted output)
+
+
+    // // To get the square with the bottom-right cut-off
+    // (start_i, start_j) = (0, 0);
+    // const MAX_STEPS: usize = 195;
+    // // (look at the normal output)
+
+    // // To get the square with the bottom-left cut-off
+    // (start_i, start_j) = (0, 130);
+    // const MAX_STEPS: usize = 195;
+    // // (look at the normal output)
+
+    // // To get the square with the top-right cut-off
+    // (start_i, start_j) = (130, 0);
+    // const MAX_STEPS: usize = 195;
+    // // (look at the normal output)
+
+    // // To get the square with the top-left cut-off
+    // (start_i, start_j) = (130, 130);
+    // const MAX_STEPS: usize = 195;
+    // // (look at the normal output)
+
+
+    // // To get the top corner
+    // const MAX_STEPS: usize = 130;
+    // (start_i, start_j) = (130, 65);
+
+    // // To get the right corner
+    // const MAX_STEPS: usize = 130;
+    // (start_i, start_j) = (65, 0);
+
+    // // To get the bottom corner
+    // const MAX_STEPS: usize = 130;
+    // (start_i, start_j) = (0, 65);
+
+    // // To get the left corner
+    // const MAX_STEPS: usize = 130;
+    // (start_i, start_j) = (65, 130);
+
+    // Account for boundary.
+    start_i += 1;
+    start_j += 1;
+
     println!("start=({start_i},{start_j})");
 
-    let mut n_reachable_exactly = 1;
+    let mut n_reachable_exactly = 0;
     let mut n_reachable_partially = 0;
-    grid[start_i][start_j] = ExactlyReachable;
+    grid[start_i][start_j] =
+        if MAX_STEPS % 2 == 0
+        {
+            n_reachable_exactly = 1;
+            ExactlyReachable
+        }
+        else
+        {
+            n_reachable_partially = 1;
+            PartiallyReachable
+        };
 
     let mut current = HashSet::<(usize,usize)>::new();
     let mut next = HashSet::<(usize,usize)>::new();
     current.insert((start_i, start_j));
 
-    const MAX_STEPS: usize = 64;
     for n_steps in 0..MAX_STEPS
     {
-        let even = n_steps % 2 == 0;
+        let even = (MAX_STEPS - n_steps) % 2 == 0;
 
         for (i, j) in current.drain()
         {
@@ -143,14 +221,23 @@ fn step_counter_part1(content: &str) -> Result<(), &str>
 
 fn print_grid(grid: &Vec<Vec<Square>>)
 {
-    for row in grid.iter()
+    for (i, row) in grid.iter().enumerate()
     {
-        for square in row
+        for (j, square) in row.iter().enumerate()
         {
-            print!("{}", match square { Rock                          => "#",
-                                        Passable                      => ".",
-                                        PartiallyReachable            => " ",
-                                        ExactlyReachable              => "\x1b[31;1mO\x1b[m" });
+            print!("{}{}\x1b[m",
+                   match (i, j)
+                   {
+                       (66, 66) => "\x1b[46m",
+                       (66, _ ) => "\x1b[44m",
+                       (_,  66) => "\x1b[42m",
+                       _        => ""
+                   },
+                   match square {
+                       Rock                          => "#",
+                       Passable                      => ".",
+                       PartiallyReachable            => " ",
+                       ExactlyReachable              => "\x1b[31;1mO\x1b[m" });
         }
         println!();
     }
