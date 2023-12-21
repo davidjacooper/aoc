@@ -52,7 +52,6 @@ fn step_counter_part2(content: &str) -> Result<(),&str>
     current.insert((start_i, start_j));
 
     let mut n_reachable_exactly = 0;
-    let mut n_reachable_partially = 0;
     explored.insert(
         (start_i, start_j),
         if TOTAL_STEPS % 2 == 0
@@ -62,7 +61,6 @@ fn step_counter_part2(content: &str) -> Result<(),&str>
         }
         else
         {
-            n_reachable_partially = 1;
             false
         });
 
@@ -80,8 +78,7 @@ fn step_counter_part2(content: &str) -> Result<(),&str>
             &grid,
             &mut explored,
             &mut current,
-            &mut n_reachable_exactly,
-            &mut n_reachable_partially);
+            &mut n_reachable_exactly);
         points.push(n_reachable_exactly);
 
         prev_n_steps = n_steps;
@@ -105,8 +102,7 @@ fn run(steps: std::ops::Range<usize>,
        grid: &Vec<Vec<bool>>,
        explored: &mut HashMap<(i64,i64),bool>,
        current: &mut HashSet<(i64,i64)>,
-       n_reachable_exactly: &mut i64,
-       n_reachable_partially: &mut i64)
+       n_reachable_exactly: &mut i64)
 {
     let height = grid.len() as i64;
     let width = grid[0].len() as i64;
@@ -128,7 +124,6 @@ fn run(steps: std::ops::Range<usize>,
                         (i2, j2),
                         if even
                         {
-                            *n_reachable_partially += 1;
                             false
                         }
                         else
@@ -146,7 +141,8 @@ fn run(steps: std::ops::Range<usize>,
             current.insert(pos);
         }
     }
-    println!("#plots reachable after {} steps: {n_reachable_exactly} ({n_reachable_partially})", n_steps);
+    print_grid(grid, explored);
+    println!("#plots reachable after {} steps: {n_reachable_exactly}", n_steps);
 }
 
 fn print_grid(grid: &Vec<Vec<bool>>, explored: &HashMap<(i64,i64),bool>)
