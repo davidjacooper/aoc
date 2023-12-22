@@ -1,5 +1,6 @@
 use std::time::Instant;
 use std::collections::{HashSet};
+use std::io::Write;
 
 fn main()
 {
@@ -153,17 +154,57 @@ fn sand_slabs_part1(content: &str) -> Result<(),&str>
         println!("  {:?}", brick);
     }
 
-    let mut n_disintegratable = 0;
+    let mut disintegratable = HashSet::<usize>::new();
     for (i, _brick) in bricks.iter().enumerate()
     {
         if above[i].iter().all(|j| below[*j].len() >= 2)
         {
-            n_disintegratable += 1;
+            disintegratable.insert(i);
         }
     }
 
-    println!("#disintegratable = {n_disintegratable}");
+    make_graph(&bricks, &below, &disintegratable).unwrap();
+    println!("#disintegratable = {}", disintegratable.len());
+
+    Ok(())
+}
 
 
+fn make_graph(bricks: &Vec<Brick>,
+              below: &Vec<HashSet<usize>>,
+              disintegratable: &HashSet<usize>) -> std::io::Result<()>
+{
+    let mut graph = std::fs::File::create("graph.dot")?;
+    writeln!(graph, "digraph {{\n  overlap=false")?;
+    for (i, brick) in bricks.iter().enumerate()
+    {
+        writeln!(graph,
+                 "  b{} [label=\"{}\",shape=\"box\",fixedsize=true,width={},height={},fillcolor=\"{}\"{}]",
+                 i,
+                 brick.z,
+                 match brick.orientation { Orientation::X => brick.len,
+                                           Orientation::Y => brick.len,
+                                           Orientation::Z => 1 } as f64 / 3.0,
+                 match brick.orientation { Orientation::Z => brick.len, _ => 1 } as f64 / 3.0,
+                 match brick.orientation { Orientation::X => "lightsalmon",
+                                           Orientation::Y => "green",
+                                           Orientation::Z => "lightskyblue" },
+                 if disintegratable.contains(&i)
+                 {
+                     ",color=\"red\",style=\"filled,dashed\",penwidth=4"
+                 }
+                 else { ",style=\"filled\"" }
+        )?;
+    }
+
+    for (i, indexes) in below.iter().enumerate()
+    {
+        for j in indexes.iter()
+        {
+            writeln!(graph, "  b{i} -> b{j}")?;
+        }
+    }
+    writeln!(graph, "}}")?;
+    println!("graphviz... {:?}", std::process::Command::new("dot").args(["-Tpdf", "-O", "graph.dot"]).output());
     Ok(())
 }
