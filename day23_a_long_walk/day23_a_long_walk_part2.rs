@@ -11,7 +11,7 @@ fn main()
         Ok(content) =>
         {
             let start = Instant::now();
-            if let Err(err) = a_long_walk_part1(&content)
+            if let Err(err) = a_long_walk_part2(&content)
             {
                 println!("ERROR: {}", err);
             }
@@ -40,7 +40,7 @@ struct Node
     dest: Vec<(usize,usize)>
 }
 
-fn a_long_walk_part1(content: &str) -> Result<(),&str>
+fn a_long_walk_part2(content: &str) -> Result<(),&str>
 {
     let grid: Vec<Vec<char>> =
         content
