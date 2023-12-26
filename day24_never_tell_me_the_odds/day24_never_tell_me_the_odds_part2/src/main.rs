@@ -89,6 +89,7 @@ fn never_tell_me_the_odds_part2(content: &str) -> Result<(),&str>
         println!("  {:?}", h);
     }
 
+
     /*
      * 2. Find the equation of a plane intersecting H0 and H1. The rock must pass through the
      * origin (H0), and it must also pass _somewhere_ through the line of H1's movement, so the
@@ -113,7 +114,6 @@ fn never_tell_me_the_odds_part2(content: &str) -> Result<(),&str>
      *   => equation for b = .... (in terms of a and various constants)
      *   => substituting in 'a', we can find 'b' in terms of only known values.
      *
-     * Equation of the plane containing H0 (the origin) and the line of H1
      */
     let h1 = &hailstones[1];
     let x_rel = (h1.pos.x + h1.vel.x) / h1.pos.x;
@@ -122,7 +122,6 @@ fn never_tell_me_the_odds_part2(content: &str) -> Result<(),&str>
 
     println!("a={a},\nb={b}");
 
-    // Intersection between the plane and H2 and H3.
 
     /*
      * 3. Find the times at which H2 and H3 intersect the plane. We are promised that there must be
@@ -142,6 +141,7 @@ fn never_tell_me_the_odds_part2(content: &str) -> Result<(),&str>
     let t2 = (h2.pos.z - a * h2.pos.x - b * h2.pos.y) / (a * h2.vel.x + b * h2.vel.y - h2.vel.z);
     let t3 = (h3.pos.z - a * h3.pos.x - b * h3.pos.y) / (a * h3.vel.x + b * h3.vel.y - h3.vel.z);
 
+
     /*
      * 4. For H2 and H3, find the (x,y,z) coordinates where each intersects the plane. We just plug
      * the calculated values of t₂ and t₃ straight into the basic parametric x/y/z equations.
@@ -152,6 +152,7 @@ fn never_tell_me_the_odds_part2(content: &str) -> Result<(),&str>
     println!("t2={t2} @ ({x2}, {y2}, {z2})");
     println!("t3={t3} @ ({x3}, {y3}, {z3})");
 
+
     /*
      * 5. Deduce the rock's (x,y,z) velocity. We just scale the distance between the H2/H3
      * intersection points by the time between the intersections.
@@ -160,6 +161,7 @@ fn never_tell_me_the_odds_part2(content: &str) -> Result<(),&str>
         (x3 - x2) / (t3 - t2),
         (y3 - y2) / (t3 - t2),
         (z3 - z2) / (t3 - t2));
+
 
     /*
      * 6. Deduce the rock's initial position. At time 0, the rock must have been t₂ times the rock's
@@ -175,6 +177,7 @@ fn never_tell_me_the_odds_part2(content: &str) -> Result<(),&str>
         }
     };
     println!("\nRock (RF shifted): {:?}", r);
+
 
     /*
      * 7. Restore the coordinate system. We've been working in a coordinate system relative to H0,
