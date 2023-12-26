@@ -1,0 +1,8 @@
+[package]
+name = "day24_never_tell_me_the_odds_part2_b"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# f128 = "0.2.9"
+decimal = "2.1.0"
