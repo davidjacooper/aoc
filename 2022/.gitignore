@@ -12,3 +12,9 @@
 
 # Other temp files
 *.swp
+
+# Don't store AOC inputs
+inputs/
+
+# Messing around
+playing/
