@@ -9,3 +9,8 @@ target/
 # All input data
 *input*.txt
 
+# Temp files
+*.Lock
+
+# Messing around
+playing/
