@@ -1,0 +1,8 @@
+Day 16: "Proboscidea Volcanium"
+===============================
+
+I first attempted this in Bash, which was an awful mistake (see "day_16_bash/bash.txt"). It actually worked for part 1, after much execution time. But the algorithm just wasn't tractable for part 2, because the solution space is too vast.
+
+Subsequently, I re-implemented the same algorithm in Rust, and also generated a Graphviz visualisation of the input graph. This visualisation led me to solve parts 1 and 2 by hand with a spreadsheet.
+
+However, purely for completeness, I was then able to adapt the same technique I used to solve day 19, and thus solve the problem "properly" (depending on your perspective). See comments under "extra_day19_rust/notes.txt".

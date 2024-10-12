@@ -1,0 +1,7 @@
+Day 9 with Julia
+================
+
+$ julia day9_part1.jl < input
+$ julia day9_part2.jl < input
+
+Thoughts: The vector addition in Julia makes this problem really quite simple!

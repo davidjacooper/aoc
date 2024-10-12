@@ -1,0 +1,20 @@
+# All files without dots
+*
+!*/
+!*.*
+
+# Other compiled files
+*.class
+*.o
+*.hi
+*.beam
+*.exe
+
+# Other temp files
+*.swp
+
+# Don't store AOC inputs
+inputs/
+
+# Messing around
+playing/

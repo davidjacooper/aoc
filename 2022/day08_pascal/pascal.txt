@@ -1,0 +1,12 @@
+Day 8 in Pascal
+===============
+
+Using Free Pascal:
+
+$ fpc day8_part1.pas
+$ ./day8_part1 < input
+
+$ fpc day8_part2.pas
+$ ./day8_part2 < input
+
+Thoughts: I grew up with Pascal, so it's with some sadness that I now see its glaring flaws. Variables cannot be declared at the point of use. 'Break' is part of the standard library, not a language construct, and yet it manipulates control flow. In this exercise, I was getting integer overflows on part 2 that resolved when I changed 'integer' (which is supposed to be 32 bits) to 'int64', and yet the largest result is 335580.

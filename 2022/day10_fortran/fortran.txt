@@ -1,0 +1,9 @@
+Day 10 with Fortran
+===================
+
+$ gfortran day10_part1.f90 -o day10_part1
+$ ./day10_part1.f90 < input
+$ gfortran day10_part2.f90 -o day10_part2
+$ ./day10_part2.f90 < input
+
+Thoughts: May I never have to use Fortran again.

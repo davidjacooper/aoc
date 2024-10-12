@@ -1,0 +1,13 @@
+Day 16 with Bash
+================
+
+$ ./day16_part1_attempt2_slow_but_correct.bash < input
+
+At the time of writing, I haven't solved part 2, and in fact my solution to part 1 is rather 
+inefficient. (It took an hour to run.)
+
+Thoughts: Bash is insideous. With all its text processing constructs, arrays and associative
+arrays, it seems as though things should be simpler than they turn out to be. The awkward syntax 
+doesn't help, but it can be gotten used to. It's the spelling errors really cripple productivity.
+Many times I've spelt a variable name incorrectly, and Bash, of course, doesn't tell you anything.
+It also doesn't help that Bash has essentially no type system.

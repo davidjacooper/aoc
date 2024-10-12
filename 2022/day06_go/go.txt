@@ -1,0 +1,7 @@
+Day 6 with Go
+=============
+
+Running:
+
+$ go run day6_part1.go < input
+$ go run day6_part2.go < input

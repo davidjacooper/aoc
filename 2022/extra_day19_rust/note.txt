@@ -1,0 +1,26 @@
+Day 19: "Not Enough Minerals"
+=============================
+
+I had been working on this in Ruby when I gave up due to holiday plans in 2022.
+
+It took me a long time to realise I could use a form of breadth-first search here, in which
+only a fixed number of candidates are retained from one iteration to the next, the others being
+discarded as unworthy. To help do this, I sort each batch of candidates lexicographically by the 
+elements of their state. For instance, we want candidates having higher numbers of geodes, or for 
+equal geodes, higher numbers of geode robots, or for equal geode robots, higher amounts of 
+obsidian, and so on.
+
+In a sense, the problem is greedy-_ish_. There's no decisive measure of goodness (that I've
+identified), but approximate goodness still wins the day.
+
+Through experimentation:
+
+* In part 1, it's sufficient to retain 63 candidates.
+* In part 2, it's sufficient to retain 648 candidates.
+
+Any fewer in either case, and the actual solution will be lost. One can comfortably retain many
+more candidates without having much noticeable impact on runtime.
+
+A depth-first search -- which I naively tried first -- leads to an enormous explosion of 
+possibilities. I attempted to impose certain constraints on these, but the constraints were always
+a bit arbitrary, liable to discard the actual solution, and still led to enormous runtime anyway.

@@ -1,0 +1,13 @@
+Day 5 in D
+==========
+
+Compiling and running:
+
+$ ldc2 day5_part1.d
+$ ./day5_part1.d < input
+
+$ ldc2 day5_part2.d
+$ ./day5_part2.d < input
+
+(Note: lcd2 is the LLVM D Compiler. The documentation references two other compilers: the reference implementation DMD, and the GCC extension.)
+
