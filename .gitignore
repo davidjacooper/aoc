@@ -12,5 +12,8 @@ target/
 # Temp files
 *.Lock
 
+# Don't store input files
+inputs/
+
 # Messing around
 playing/
